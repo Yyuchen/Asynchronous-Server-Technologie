@@ -1,4 +1,5 @@
 # AsynchronousServer
+[![Build Status](https://travis-ci.org/Yyuchen/Asynchronous-Server-Technologie.svg?branch=master)](https://travis-ci.org/Yyuchen/Asynchronous-Server-Technologie)
 ## Introduction
 * Ce dépot concerne le cours'Asynchronous Server Technology'. <br/>
 * Dans ce dépot il y aura les différents TP qui conduise l'apprentisage de Node.JS<br/>
