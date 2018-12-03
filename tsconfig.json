@@ -57,10 +57,14 @@
   },
   
 "include": [
-    "src/**/*"
+    "src/**/*","src/metrics.test.ts"
 ],
 "exclude": [
     "node_modules",
     "**/*.spec.ts"
-]
+],
+"typeRoots": [
+  "node_modules/@types",
+  "@types"
+],
 }

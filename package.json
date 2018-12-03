@@ -7,6 +7,7 @@
     "@types/body-parser": "^1.17.0",
     "@types/del": "^3.0.1",
     "@types/express-session": "^1.15.11",
+    "@types/json-stringify-safe": "^5.0.0",
     "@types/morgan": "^1.7.35",
     "body-parser": "^1.18.3",
     "boostrap": "^2.0.0",
@@ -16,6 +17,7 @@
     "express-session": "^1.15.6",
     "jquery": "^3.3.1",
     "json": "^9.0.6",
+    "level": "^4.0.0",
     "level-session-store": "^2.1.0",
     "level-ws": "^1.0.0",
     "leveldown": "^4.0.1",
@@ -37,11 +39,11 @@
     "typescript": "^3.1.6"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha -r ts-node/register src/**/*.test.ts",
+    "test": "mkdir -p db_test && ./node_modules/.bin/mocha -r ts-node/register src/**/*.test.ts",
     "build": "./node_modules/.bin/tsc -p tsconfig.json",
     "start": "./node_modules/.bin/ts-node src/server.ts",
     "dev": "./node_modules/.bin/nodemon ",
-    "populate": "./node_modules/.bin/tsv -p tsconfig.jscon"
+    "populate": "./node_modules/.bin/ts-node bin/populate.ts"
   },
   "author": "Yuchen Huang",
   "license": "ISC"
