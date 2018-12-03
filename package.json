@@ -4,9 +4,13 @@
   "description": "* Ce dépot concerne le cours'Asynchronous Server Technology'. <br/>\r * Dans ce dépot il y aura les différents TP qui conduise l'apprentisage de Node.JS<br/>\r * Ici c'est le TP2: Routage en Express<br/>\r ## Instructions d'installations\r Installez nodeJS : https://nodejs.org/en/download/<br/>\r Installer npm: https://www.npmjs.com/<br/>\r ## Instruction d'usage\r - Lancer un invité de commande et déplacer dans le dossier d'application.<br/>\r - En suite saisi la commande `node index.js` pour lancer l'application.<br/>\r - Pour visualiser le résultat, lancer l'explorateur (ex. Edge) et saisi l'URL http://localhost:1337/  sur le bar de navigation<br/>\r - Cette application possède 3 addresse (route) : <br/>\r - `/` : la page explique comment utiliser la commande /hello?name= . <br/>\r - Ecrire dans me bar de navigateur l'url `/hello/MonPrenom` , la page vous dira bonjour avec une bref presentation sur moi, sinon il vous dira bonjour tout simplement. <br/>\r - Toute autre url répondent par une message erreur 404. <br/>\r ## Contributeur\r <b>Yuchen HUANG</b>",
   "main": "index.js",
   "dependencies": {
-    "@types/node": "^10.12.9",
+    "@types/body-parser": "^1.17.0",
+    "@types/del": "^3.0.1",
+    "@types/express-session": "^1.15.11",
+    "@types/morgan": "^1.7.35",
     "body-parser": "^1.18.3",
     "boostrap": "^2.0.0",
+    "del": "^3.0.0",
     "encoding-down": "^5.0.4",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
@@ -23,6 +27,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.11",
     "chai": "^4.2.0",
     "ejs": "^2.6.1",
     "mocha": "^5.2.0",

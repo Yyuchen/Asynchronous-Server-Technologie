@@ -1,12 +1,10 @@
 import encoding from 'encoding-down'
 import leveldown from 'leveldown'
 import levelup from 'levelup'
-import { fstat } from 'fs';
-
 import fs = require('fs');
 import del = require('del');
 
-export class LevelDb {
+export class LevelDB {
   static open(path: string) {
     const encoded = encoding(
         leveldown(path),

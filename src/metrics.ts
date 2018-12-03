@@ -1,13 +1,12 @@
-import { LevelDb } from "./leveldb";
 import WriteStream from "level-ws";
 
-///Cours
+
 export class  Metric {
-  public timestamp:number
+  public timestamp:string
   public value:number
 
   constructor(ts: string, v:number){
-    this.timestamp = new Date(ts).getTime()
+    this.timestamp = ts
     this.value = v
   }
 }
@@ -16,8 +15,8 @@ export class  Metric {
 export class MetricsHandler{
   public db : any
 
-  constructor (path:string){
-    this.db = LevelDb.open(path)
+  constructor (db: any){
+    this.db = db
   }
 
   public save(key: string, metrics: Metric[], callback: (error: Error | null) => void) {
@@ -25,30 +24,40 @@ export class MetricsHandler{
 
     stream.on('error', callback)
     stream.on('close', callback)
-    metrics.forEach(m => {
-      stream.write({ key: `metric:${key}${m.timestamp}`, value: m.value })
+    metrics.forEach((m : Metric) => {
+      stream.write({ key: `metric:${key}:${m.timestamp}`, value: m.value })
     })
-
     stream.end()
-
   }
 
   public get(key:string, callback: (err:Error | null, result?: Metric[]) => void) {
   
     const stream = this.db.createReadStream()
-    var met : Metric[] = []
+    var metrics : Metric[] = []
     stream.on('error',callback)
-    stream.on('end',(err:Error)=>callback(null,met))
+    stream.on('end',(err:Error)=>callback(null,metrics))
     stream.on('data',(data:any)=>{
-      const [_,k,timestamp]=data.key.split(":")
-      const value = data.value
+      var _a = data.key.split(":"), 
+      _ = _a[0],
+      k = _a[1],
+      timestamp = _a[2];
+      var value = data.value;
+      //ou 
+      //const [_, k, timestamp] = data.key.split(":")
+      //const value = data.value
+
       if(key!=k){
-        console.log('LevelDB error: ${data} does not match key ${key}')
+        console.log(`LevelDB error: ${data} does not match key ${key}`)
       }
-      met.push(new Metric (timestamp,value))
+      metrics.push(new Metric (timestamp,value))
   
     })
   
+  }
+
+  public remove(key: string, callback:(err:Error|null)=>void){
+    //TODO
+    callback(null)
   }
 }
 

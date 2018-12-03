@@ -6,13 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var encoding_down_1 = __importDefault(require("encoding-down"));
 var leveldown_1 = __importDefault(require("leveldown"));
 var levelup_1 = __importDefault(require("levelup"));
-var LevelDb = /** @class */ (function () {
-    function LevelDb() {
+class LevelDb{
+    static open(path){
+        const encoded = encoding_down_1.default(leveldown_1.default("path"),{valueEncoding:'json'});
+        return leveldown_1.default(encoded);
     }
-    LevelDb.open = function (path) {
-        var encoded = encoding_down_1.default(leveldown_1.default(path), { valueEncoding: 'json' });
-        return levelup_1.default(encoded);
-    };
-    return LevelDb;
-}());
+}
+
 exports.LevelDb = LevelDb;

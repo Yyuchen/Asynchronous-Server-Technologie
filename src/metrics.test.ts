@@ -4,7 +4,7 @@ import { LevelDB } from "./leveldb"
 
 
 const dbPath: string = "db_test"
-var dbMet MetricsHandler = new MetricsHandler('./db')
+var dbMet : MetricsHandler
 
 describe('Metrics', function () {
 
@@ -30,19 +30,16 @@ describe('Metrics', function () {
     describe('#save',function(){
         
             it('should save data', function(){
-
+                //TODO
             })
             it('should update data',function(){
-
+                //TODO
             })
         })
 
     describe('#delete',function(){
         it('should delete data', function(){
-            
+            //TODO
         })
-    })
-
-        
     })
 })

@@ -10,7 +10,7 @@ app.get('/', function (req, res) {
     res.send();
 });
 app.get('/metrics/:id', function (req, res) {
-    metrics_1.MetricsHandler.get(req.parames.id, function (err, result) {
+    dbMetrics.get(req.parames.id, function (err, result) {
         if (err)
             throw err;
         if (result == undefined) {
@@ -25,5 +25,5 @@ app.listen(port, function (err) {
     if (err) {
         throw err;
     }
-    console.log(server, is, listening, on, port, $, { port: port });
+    console.log(`server, is, listening, on port ${ port}`);
 });
