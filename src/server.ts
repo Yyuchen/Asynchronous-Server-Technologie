@@ -10,47 +10,46 @@ import { MetricsHandler, Metric } from './metrics'
 
 const LevelStore = levelSession(session)
 
+//initialisation des routers
 const port: string = process.env.PORT || '8080'
 const app = express()
+const authRouter = express.Router()
 const userRouter = express.Router()
-const metricsRouter =express.Router()
+const metricsRouter = express.Router()
 
+///instanciation les connextion des bases
 const db = LevelDB.open('./db/app')
 const dbMetrics = new MetricsHandler(db) //ouverture de connextion au base
 const dbUser = new UserHandler(db)
 
+///configuration du main app
 app.use(bodyparser.json())
-
 app.use(bodyparser.urlencoded())
-
 app.use(morgan('dev'))
-
 app.use(session({
   secret: 'my very secret phrase',
   store: new LevelStore('./db/sessions'),
   resave: true,
   saveUninitialized: true
 }))
-
 app.set('views',__dirname+'/../views')
-
 app.set('view engine','ejs')
-
 app.use('/',express.static(path.join(__dirname,'../node_modules/jquery/dist')))
 app.use('/',express.static(path.join(__dirname,'../node_modules/bootstrap/dist')))
 
-/*
-    Authentication
-*/
-const authRouter = express.Router()
 
+///Authentication
+
+//login
 authRouter.get('/login',function(req:any,res:any){
     res.render('login');
 })
 
 authRouter.post('/login', (req: any, res: any, next: any) => {
     dbUser.get(req.body.username, (err: Error | null, result?: User) => {
-      if (err) next(err)
+      if (err) {
+        res.status(401).send("Error de login")
+      }
       if (result === undefined || !result.validatePassword(req.body.username)) {
         res.redirect('/login')
       } else {
@@ -61,10 +60,28 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
     })
 })
 
-authRouter.get('/index',function(req:any,res:any){
-    res.render('index');
+//signup
+/*authRouter.get('/signup',function(req:any,res:any){
+    res.render('signup');
 })
 
+authRouter.post('/signup', (req: any, res: any, next: any) => {
+    dbUser.get(req.body.username, (err: Error | null, result?: User) => {
+      if (err) next(err)
+      if (result === undefined || !result.validatePassword(req.body.username)) {
+        res.redirect('/login')
+      } else {
+        req.session.loggedIn = true
+        req.session.user = result
+        res.redirect('/')
+      }
+    })
+})*/
+
+
+authRouter.get('/signup',function(req:any,res:any){
+    res.render('signup')
+})
 
 authRouter.get('/logout', (req: any, res: any) => {
     if(req.session.loggedIn){
@@ -74,9 +91,7 @@ authRouter.get('/logout', (req: any, res: any) => {
     res.redirect('/login')
 })
 
-authRouter.get('/signup',function(req:any,res:any){
-    res.render('signup')
-})
+
 
  //authMiddleware
   const authCheck = function (req: any, res: any, next: any) {
@@ -108,7 +123,9 @@ userRouter.get('/:username',function( req:any , res:any , next:any){
         }
     })
 })
-userRouter.post('/',function(req:any , res:any , next:any){
+
+
+userRouter.post('/signup',function(req:any , res:any , next:any){
     dbUser.get(req.body.username, function(err:Error| null,result?:User){
         if(!err||result !== undefined){
             res.status(409).send("user already exist")

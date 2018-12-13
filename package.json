@@ -9,6 +9,7 @@
     "@types/express-session": "^1.15.11",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/morgan": "^1.7.35",
+    "basic-auth": "^2.0.1",
     "body-parser": "^1.18.3",
     "boostrap": "^2.0.0",
     "del": "^3.0.0",
