@@ -57,7 +57,7 @@ export class UserHandler {
     public save(user: User, callback: (err: Error | null) => void) {
       this.db.put(
         `user:${user.username}`,
-        `${user.getPassword}:${user.email}`,
+        `${user.getPassword()}:${user.email}`,
         (err:Error|null)=>{
           callback(err)
         }

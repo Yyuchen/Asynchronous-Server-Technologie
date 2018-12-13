@@ -9,8 +9,11 @@ import { UserHandler, User } from './users'
 import { MetricsHandler, Metric } from './metrics'
 
 const LevelStore = levelSession(session)
-const app = express()
+
 const port: string = process.env.PORT || '8080'
+const app = express()
+const userRouter = express.Router()
+const metricsRouter =express.Router()
 
 const db = LevelDB.open('./db/app')
 const dbMetrics = new MetricsHandler(db) //ouverture de connextion au base
@@ -29,7 +32,7 @@ app.use(session({
   saveUninitialized: true
 }))
 
-app.set('view',__dirname+'../views')
+app.set('views',__dirname+'/../views')
 
 app.set('view engine','ejs')
 
@@ -42,7 +45,7 @@ app.use('/',express.static(path.join(__dirname,'../node_modules/bootstrap/dist')
 const authRouter = express.Router()
 
 authRouter.get('/login',function(req:any,res:any){
-    res.render('login')
+    res.render('login');
 })
 
 authRouter.post('/login', (req: any, res: any, next: any) => {
@@ -56,6 +59,10 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
         res.redirect('/')
       }
     })
+})
+
+authRouter.get('/index',function(req:any,res:any){
+    res.render('index');
 })
 
 
@@ -90,7 +97,7 @@ app.use(authRouter)
   Users
 */ 
 
-const userRouter = express.Router()
+
 userRouter.get('/:username',function( req:any , res:any , next:any){
     dbUser.get(req.parames.username,function(err:Error|null,result?:User){
         if(err || result === undefined){
@@ -126,7 +133,7 @@ userRouter.delete('/:username',function(req:any, res:any, next:any){
  Metrics
 */
   
-const metricsRouter =express.Router()
+
 
 metricsRouter.use(function (req:any,res:any,next:any){
     console.log("called metrics router")
@@ -166,7 +173,8 @@ app.use('/metrics',authCheck,metricsRouter)
 app.use(function (err: Error, req: any, res: any, next: any) {
     console.log('got an error')
     console.error(err.stack)
-    res.status(500).send('Something broke!')
+    // res.status(500).send('Something broke!')
+    res.status(500).send(err+"aaaa")
   })
 
 app.listen(port, (err: Error) => {
