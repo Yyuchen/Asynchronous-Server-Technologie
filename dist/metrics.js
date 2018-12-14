@@ -1,55 +1,54 @@
 "use strict";
-
-var __importDefault = (this&&this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod:{"default":mod};
-}
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const leveldb_1 = require("./leveldb");
-const level_ws_1 = __importDefault(require("level-ws"));
-
-class Metric  {
-    constructor (ts, v) {
-        this.timestamp = new Date(ts).getTime();
+var level_ws_1 = __importDefault(require("level-ws"));
+var Metric = /** @class */ (function () {
+    function Metric(ts, v) {
+        this.timestamp = ts;
         this.value = v;
     }
-}
+    return Metric;
+}());
 exports.Metric = Metric;
-
-class MetricsHandler {
-    constructor (path) {
-        this.db = leveldb_1.LevelDb.open(path);
+var MetricsHandler = /** @class */ (function () {
+    function MetricsHandler(db) {
+        this.db = db;
     }
-    save = function (key, metrics, callback) {
-         const stream = level_ws_1.default(this.db)
-         stream.on('error', callback)
-         stream.on('close', callback)
-         metrics.forEach(m => {
-         stream.write({ key: `metric:${key}${m.timestamp}`, value: m.value });
-         });
-         stream.end();
-    }
-    get(key, callback)
-    {
-        const stream = this.db.createReadStream();
-        var data=[];
+    MetricsHandler.prototype.save = function (key, metrics, callback) {
+        var stream = level_ws_1.default(this.db);
         stream.on('error', callback);
-        stream.on('end', callback(null, data));
-        stream.on('data', function (data) {
-            var _a = data.key.split(":"), 
-            _ = _a[0],
-            k = _a[1],
-            timestamp = _a[2];
-            var value = data.value;
-            if (key != k) {
-                console.log(`LevelDB error: ${data} does not match key ${key}`);
-            }else{
-                data.push(new Metric(timestamp, value));
-            }
+        stream.on('close', callback);
+        metrics.forEach(function (m) {
+            stream.write({ key: "metric:" + key + ":" + m.timestamp, value: m.value });
         });
-    }  
-}
+        stream.end();
+    };
+    MetricsHandler.prototype.get = function (key, callback) {
+        var stream = this.db.createReadStream();
+        var metrics = [];
+        stream.on('error', callback);
+        stream.on('end', function (err) { return callback(null, metrics); });
+        stream.on('data', function (data) {
+            var _a = data.key.split(":"), _ = _a[0], k = _a[1], timestamp = _a[2];
+            var value = data.value;
+            //ou 
+            //const [_, k, timestamp] = data.key.split(":")
+            //const value = data.value
+            if (key != k) {
+                console.log("LevelDB error: " + data + " does not match key " + key);
+            }
+            metrics.push(new Metric(timestamp, value));
+        });
+    };
+    MetricsHandler.prototype.remove = function (key, callback) {
+        //TODO
+        callback(null);
+    };
+    return MetricsHandler;
+}());
 exports.MetricsHandler = MetricsHandler;
-
 /*static get(calllback: (err:Error | null, result?: Metric[] ) => void){
   calllback(null,[
     new Metric('2013-11-04 14:00 UTC',12),

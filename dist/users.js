@@ -1,71 +1,59 @@
 "use strict";
-var __importDefault = (this&&this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod:{"default":mod};
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-const leveldb_1 = require("./leveldb");
-const level_ws_1 = __importDefault(require("level-ws"));
-const bcrypt = require("bcrypt");
-
-class User  {
-
-    constructor(username, email, password, passwordHashed=false) {
-        this.username = username
-        this.email = email
-        if (!passwordHashed) {
-        this.setPassword(password)
-        } 
-        else this.password = password
-      }
-
+var User = /** @class */ (function () {
+    function User(username, email, password) {
+        this.password = "";
+        this.passwordHashed = false;
+        this.username = username;
+        this.email = email;
+        if (!this.passwordHashed) {
+            this.setPassword(password);
+        }
+        else
+            this.password = password;
+    }
     // Parse db result and return a User  
-    static fromDb(username, value){
-    const[password,email] = value.split(":")
-    return new User(username,email,password)
+    User.fromDb = function (username, value) {
+        var _a = value.split(":"), password = _a[0], email = _a[1];
+        return new User(username, email, password);
+    };
+    //Hash et set password
+    User.prototype.setPassword = function (toSet) {
+        this.password = toSet;
+        this.passwordHashed = true;
+    };
+    User.prototype.getPassword = function () {
+        return this.password;
+    };
+    // return comparison with hashed password
+    User.prototype.validatePassword = function (toValidate) {
+        return this.password === toValidate;
+    };
+    return User;
+}());
+exports.User = User;
+var UserHandler = /** @class */ (function () {
+    function UserHandler(db) {
+        this.db = db;
     }
-
-    //hacher le pwd
-    setPassword(plaintextPwd){
-        const saltRounds = 10
-        this.password = bcrypt.hash(plaintextpwd,saltRounds)
-    }
-
-    //Check si le mot de pass est correct
-    checkPassword(inputPwd){
-        return bcrypt.compare(inputPwd,this.password,function(err,res){
-            if(err){
-                res.send("Mot de passe erreur")
-            }
-        })
-    }
-}
-exports.Metric = Metric;
-
-class UserHandler{
-    constructor (path) {
-        this.db = leveldb_1.LevelDb.open(path);
-    }
-    getUserHandler(username, callback: (err: Error | null, result?: User) => void) {
-        this.db.get(`user:${username}`, function (err: Error, data: any) {
-          if (err) throw callback(err)
-          else if (data===undefined) callback(null,data)
-          else callback(null, User.fromDb(username,data))
-        })
-      }
-    
-      public save(user: User, callback: (err: Error | null) => void) {
-        this.db.put(
-          `user:${user.username}`,
-          `${user.getPassword()}:${user.email}`,
-          (err:Error|null)=>{
-            callback(err)
-          }
-        )
-      }
-    
-      public delete(username: string, callback: (err: Error | null) => void) {
+    UserHandler.prototype.get = function (username, callback) {
+        this.db.get("user:" + username, function (err, data) {
+            if (err)
+                throw callback(err);
+            else if (data === undefined)
+                callback(null, data);
+            else
+                callback(null, User.fromDb(username, data));
+        });
+    };
+    UserHandler.prototype.save = function (user, callback) {
+        this.db.put("user:" + user.username, user.getPassword() + ":" + user.email, function (err) {
+            callback(err);
+        });
+    };
+    UserHandler.prototype.delete = function (username, callback) {
         // TODO
-      }
-
-
-}
+    };
+    return UserHandler;
+}());
+exports.UserHandler = UserHandler;

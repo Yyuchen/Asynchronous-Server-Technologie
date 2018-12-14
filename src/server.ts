@@ -41,6 +41,8 @@ app.use('/',express.static(path.join(__dirname,'../node_modules/bootstrap/dist')
 ///Authentication
 
 //login
+
+
 authRouter.get('/login',function(req:any,res:any){
     res.render('login');
 })
@@ -52,6 +54,7 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
       }
       if (result === undefined || !result.validatePassword(req.body.username)) {
         res.redirect('/login')
+        res.send("Erreur de mot de passe ou identifiant")
       } else {
         req.session.loggedIn = true
         req.session.user = result
@@ -59,25 +62,6 @@ authRouter.post('/login', (req: any, res: any, next: any) => {
       }
     })
 })
-
-//signup
-/*authRouter.get('/signup',function(req:any,res:any){
-    res.render('signup');
-})
-
-authRouter.post('/signup', (req: any, res: any, next: any) => {
-    dbUser.get(req.body.username, (err: Error | null, result?: User) => {
-      if (err) next(err)
-      if (result === undefined || !result.validatePassword(req.body.username)) {
-        res.redirect('/login')
-      } else {
-        req.session.loggedIn = true
-        req.session.user = result
-        res.redirect('/')
-      }
-    })
-})*/
-
 
 authRouter.get('/signup',function(req:any,res:any){
     res.render('signup')
@@ -92,8 +76,8 @@ authRouter.get('/logout', (req: any, res: any) => {
 })
 
 
-
- //authMiddleware
+app.use(authRouter)
+ //authCheck = authMiddleware
   const authCheck = function (req: any, res: any, next: any) {
     if (req.session.loggedIn) {
       next()
@@ -103,14 +87,15 @@ authRouter.get('/logout', (req: any, res: any) => {
 /*
   Root
 */
-app.use(authRouter)
-  app.get('/', authCheck, (req: any, res: any) => {
+
+app.get('/', authCheck, (req: any, res: any) => {
     res.render('index', { name: req.session.username })
 })
 
 /*
   Users
 */ 
+
 
 
 userRouter.get('/:username',function( req:any , res:any , next:any){
@@ -145,7 +130,7 @@ userRouter.delete('/:username',function(req:any, res:any, next:any){
     })
 })
 
-
+app.use('/user', userRouter)
 /*
  Metrics
 */
