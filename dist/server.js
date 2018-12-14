@@ -42,35 +42,24 @@ authRouter.get('/login', function (req, res) {
 authRouter.post('/login', function (req, res, next) {
     dbUser.get(req.body.username, function (err, result) {
         if (err) {
+            console.log("00");
             res.status(401).send("Error de login");
+            next(err);
         }
-        if (result === undefined || !result.validatePassword(req.body.username)) {
+        else if (result === undefined || !result.validatePassword(req.body.username)) {
+            console.log("0");
             res.redirect('/login');
+            next(err);
         }
         else {
+            console.log("1");
             req.session.loggedIn = true;
             req.session.user = result;
             res.redirect('/');
+            console.log("2");
         }
     });
 });
-//signup
-/*authRouter.get('/signup',function(req:any,res:any){
-    res.render('signup');
-})
-
-authRouter.post('/signup', (req: any, res: any, next: any) => {
-    dbUser.get(req.body.username, (err: Error | null, result?: User) => {
-      if (err) next(err)
-      if (result === undefined || !result.validatePassword(req.body.username)) {
-        res.redirect('/login')
-      } else {
-        req.session.loggedIn = true
-        req.session.user = result
-        res.redirect('/')
-      }
-    })
-})*/
 authRouter.get('/signup', function (req, res) {
     res.render('signup');
 });
@@ -81,7 +70,8 @@ authRouter.get('/logout', function (req, res) {
     }
     res.redirect('/login');
 });
-//authMiddleware
+app.use(authRouter);
+//authCheck = authMiddleware
 var authCheck = function (req, res, next) {
     if (req.session.loggedIn) {
         next();
@@ -92,8 +82,8 @@ var authCheck = function (req, res, next) {
 /*
   Root
 */
-app.use(authRouter);
 app.get('/', authCheck, function (req, res) {
+    console.log("3");
     res.render('index', { name: req.session.username });
 });
 /*
@@ -131,6 +121,7 @@ userRouter.delete('/:username', function (req, res, next) {
         res.status(200).send();
     });
 });
+app.use('/user', userRouter);
 /*
  Metrics
 */

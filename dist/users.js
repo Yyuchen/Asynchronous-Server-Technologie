@@ -33,13 +33,16 @@ var User = /** @class */ (function () {
 }());
 exports.User = User;
 var UserHandler = /** @class */ (function () {
+    /*constructor(db: any) {
+      this.db = db
+    }*/
     function UserHandler(db) {
         this.db = db;
     }
     UserHandler.prototype.get = function (username, callback) {
         this.db.get("user:" + username, function (err, data) {
             if (err)
-                throw callback(err);
+                throw err;
             else if (data === undefined)
                 callback(null, data);
             else

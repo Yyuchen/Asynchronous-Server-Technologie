@@ -19,6 +19,7 @@ export class User {
 
   // Parse db result and return a User  
   static fromDb(username:string, value: any): User {
+    console.log("3")
   const[password,email] = value.split(":")
   return new User(username,email,password)
   }
@@ -44,24 +45,27 @@ export class UserHandler {
   
   public db: any
 
-  constructor(db: any) {
+  constructor(db : any) {
     this.db = db
   }
   
     public get(username: string, callback: (err: Error | null, result?: User) => void) {
       this.db.get(`user:${username}`, function (err: Error, data: any) {
+        console.log(data)
         if (err) throw err
-        else if (data===undefined) callback(null,data)
-        else callback(null, User.fromDb(username,data))
+        if (data===undefined) {callback(null,data)}
+        else callback(null, User.fromDb(username,data)) 
       })
+
     }
 
     public save(user: User, callback: (err: Error | null) => void) {
-      const stream = WriteStream(this.db)
-      stream.on('error', callback)
-      stream.on('close', callback)
-      stream.write({ username: user.username, email: user.email, password:user.getPassword, passwordHashed:false })
-      stream.end()
+      this.db.put(
+        `user:${user.username}`,
+        `${user.getPassword()}:${user.email}`,
+        (err: Error | null) => {
+          callback(err);
+        })
     }
   
     public delete(username: string, callback: (err: Error | null) => void) {
