@@ -1,7 +1,7 @@
 #!/user/bin/env/ ts-node
 
 import { Metric, MetricsHandler } from '../src/metrics';
-import { User } from '../src/users';
+import { User, UserHandler } from '../src/users';
 
 const met =[
     new Metric(`${new Date('2013-11-04 14:00 UTC').getTime()}`, 12),
@@ -17,6 +17,12 @@ const db = new MetricsHandler('./db')
         if(err)throw err 
         console.log('Data populated')
 })
+
+const db1=new UserHandler('./db')
+    db1.save(user1,(err:Error|null)=>{
+        if(err)throw err
+        console.log('User populated')
+    })
 
 
    

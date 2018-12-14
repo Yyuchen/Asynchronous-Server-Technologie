@@ -50,15 +50,20 @@ authRouter.get('/login',function(req:any,res:any){
 authRouter.post('/login', (req: any, res: any, next: any) => {
     dbUser.get(req.body.username, (err: Error | null, result?: User) => {
       if (err) {
+        console.log("00")
         res.status(401).send("Error de login")
+        next(err)
       }
-      if (result === undefined || !result.validatePassword(req.body.username)) {
+      else if (result === undefined || !result.validatePassword(req.body.username)) {
+        console.log("0")
         res.redirect('/login')
-        res.send("Erreur de mot de passe ou identifiant")
+        next(err)
       } else {
+        console.log("1")
         req.session.loggedIn = true
         req.session.user = result
         res.redirect('/')
+        console.log("2")
       }
     })
 })
@@ -77,6 +82,7 @@ authRouter.get('/logout', (req: any, res: any) => {
 
 
 app.use(authRouter)
+
  //authCheck = authMiddleware
   const authCheck = function (req: any, res: any, next: any) {
     if (req.session.loggedIn) {
@@ -89,7 +95,9 @@ app.use(authRouter)
 */
 
 app.get('/', authCheck, (req: any, res: any) => {
+    console.log("3")
     res.render('index', { name: req.session.username })
+    
 })
 
 /*
@@ -134,8 +142,6 @@ app.use('/user', userRouter)
 /*
  Metrics
 */
-  
-
 
 metricsRouter.use(function (req:any,res:any,next:any){
     console.log("called metrics router")

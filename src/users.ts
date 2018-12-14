@@ -50,20 +50,18 @@ export class UserHandler {
   
     public get(username: string, callback: (err: Error | null, result?: User) => void) {
       this.db.get(`user:${username}`, function (err: Error, data: any) {
-        if (err) throw callback(err)
+        if (err) throw err
         else if (data===undefined) callback(null,data)
         else callback(null, User.fromDb(username,data))
       })
     }
-  
+
     public save(user: User, callback: (err: Error | null) => void) {
-      this.db.put(
-        `user:${user.username}`,
-        `${user.getPassword()}:${user.email}`,
-        (err:Error|null)=>{
-          callback(err)
-        }
-      )
+      const stream = WriteStream(this.db)
+      stream.on('error', callback)
+      stream.on('close', callback)
+      stream.write({ username: user.username, email: user.email, password:user.getPassword, passwordHashed:false })
+      stream.end()
     }
   
     public delete(username: string, callback: (err: Error | null) => void) {
