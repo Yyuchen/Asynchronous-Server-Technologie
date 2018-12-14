@@ -6,11 +6,12 @@ export class User {
   public username: string
   public email: string
   private password: string = ""
+  private passwordHashed: boolean =false
   
-  constructor(username: string, email: string, password: string, passwordHashed: boolean = false) {
+  constructor(username: string, email: string, password: string,) {
     this.username = username
     this.email = email
-    if (!passwordHashed) {
+    if (!this.passwordHashed) {
     this.setPassword(password)
     } 
     else this.password = password
@@ -25,6 +26,7 @@ export class User {
   //Hash et set password
   public setPassword(toSet: string): void {
   this.password = toSet
+  this.passwordHashed=true
   }
     
   public getPassword(): string {

@@ -15,5 +15,13 @@ Installer npm: https://www.npmjs.com/<br/>
 - `/` : la page explique comment utiliser la commande /hello?name= . <br/>
 - Ecrire dans me bar de navigateur l'url `/hello/MonPrenom` , la page vous dira bonjour avec une bref presentation sur moi, sinon il vous dira bonjour tout simplement. <br/>
 - Toute autre url répondent par une message erreur 404. <br/>
+
+## Reference
+- Class code:
+https://github.com/cberez/ece-ast-2018
+
+- node.bcrypt.js:
+https://github.com/kelektiv/node.bcrypt.js
+
 ## Contributeur
 <b>Yuchen HUANG</b>
