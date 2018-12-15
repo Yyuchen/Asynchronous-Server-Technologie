@@ -1,6 +1,8 @@
 import { LevelDB } from "./leveldb"
 import WriteStream from 'level-ws'
 import { userInfo } from "os";
+import { callbackify } from "util";
+const bcrypt = require('bcrypt')
 
 export class User {
   public username: string
@@ -25,18 +27,21 @@ export class User {
   }
 
   //Hash et set password
-  public setPassword(toSet: string): void {
-  this.password = toSet
-  this.passwordHashed=true
+  public setPassword(plaintextpwd: string): void {
+    const saltRounds = 10
+    this.password = bcrypt.hash(plaintextpwd,saltRounds)
+    this.passwordHashed=true
   }
     
   public getPassword(): string {
   return this.password
   }
 
-  // return comparison with hashed password
-  public validatePassword(toValidate: String): boolean {
-  return this.password === toValidate
+
+
+  //Check si le mot de pass est correct
+  validatePassword(inputPwd : string) : boolean{
+      return bcrypt.compare(inputPwd,this.password)
   }
 }
 
@@ -51,7 +56,6 @@ export class UserHandler {
   
     public get(username: string, callback: (err: Error | null, result?: User) => void) {
       this.db.get(`user:${username}`, function (err: Error, data: any) {
-        console.log(data)
         if (err) throw err
         if (data===undefined) {callback(null,data)}
         else callback(null, User.fromDb(username,data)) 

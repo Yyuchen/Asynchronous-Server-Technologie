@@ -1,6 +1,5 @@
-2018/12/14-19:58:44.807 557c Recovering log #67
-2018/12/14-19:58:44.808 557c Level-0 table #3: started
-2018/12/14-19:58:44.812 557c Level-0 table #3: 350 bytes OK
-2018/12/14-19:58:44.817 557c Delete type=0 #67
-2018/12/14-19:58:44.818 557c Delete type=2 #68
-2018/12/14-19:58:44.818 557c Delete type=3 #1
+2018/12/15-14:00:02.758 57cc Recovering log #94
+2018/12/15-14:00:02.758 57cc Level-0 table #96: started
+2018/12/15-14:00:02.770 57cc Level-0 table #96: 350 bytes OK
+2018/12/15-14:00:02.801 57cc Delete type=0 #94
+2018/12/15-14:00:02.803 57cc Delete type=3 #92

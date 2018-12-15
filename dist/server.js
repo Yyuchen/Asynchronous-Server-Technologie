@@ -17,7 +17,7 @@ var authRouter = express.Router();
 var userRouter = express.Router();
 var metricsRouter = express.Router();
 ///instanciation les connextion des bases
-var db = leveldb_1.LevelDB.open('./db/app');
+var db = leveldb_1.LevelDB.open('./db/users');
 var dbMetrics = new metrics_1.MetricsHandler(db); //ouverture de connextion au base
 var dbUser = new users_1.UserHandler(db);
 ///configuration du main app
@@ -39,6 +39,7 @@ app.use('/', express.static(path.join(__dirname, '../node_modules/bootstrap/dist
 authRouter.get('/login', function (req, res) {
     res.render('login');
 });
+//req.body.username
 authRouter.post('/login', function (req, res, next) {
     dbUser.get(req.body.username, function (err, result) {
         if (err) {
@@ -46,9 +47,10 @@ authRouter.post('/login', function (req, res, next) {
             res.status(401).send("Error de login");
             next(err);
         }
-        else if (result === undefined || !result.validatePassword(req.body.username)) {
+        else if (result === undefined || !result.validatePassword(req.body.password)) {
             console.log("0");
-            res.redirect('/login');
+            res.send(req.body.username);
+            //res.redirect('/login')
             next(err);
         }
         else {
@@ -83,7 +85,6 @@ var authCheck = function (req, res, next) {
   Root
 */
 app.get('/', authCheck, function (req, res) {
-    console.log("3");
     res.render('index', { name: req.session.username });
 });
 /*

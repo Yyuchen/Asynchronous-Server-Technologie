@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var bcrypt = require('bcrypt');
 var User = /** @class */ (function () {
     function User(username, email, password) {
         this.password = "";
@@ -14,28 +15,27 @@ var User = /** @class */ (function () {
     }
     // Parse db result and return a User  
     User.fromDb = function (username, value) {
+        console.log("3");
         var _a = value.split(":"), password = _a[0], email = _a[1];
         return new User(username, email, password);
     };
     //Hash et set password
-    User.prototype.setPassword = function (toSet) {
-        this.password = toSet;
+    User.prototype.setPassword = function (plaintextpwd) {
+        var saltRounds = 10;
+        this.password = bcrypt.hash(plaintextpwd, saltRounds);
         this.passwordHashed = true;
     };
     User.prototype.getPassword = function () {
         return this.password;
     };
-    // return comparison with hashed password
-    User.prototype.validatePassword = function (toValidate) {
-        return this.password === toValidate;
+    //Check si le mot de pass est correct
+    User.prototype.validatePassword = function (inputPwd) {
+        return bcrypt.compare(inputPwd, this.password);
     };
     return User;
 }());
 exports.User = User;
 var UserHandler = /** @class */ (function () {
-    /*constructor(db: any) {
-      this.db = db
-    }*/
     function UserHandler(db) {
         this.db = db;
     }
@@ -43,8 +43,9 @@ var UserHandler = /** @class */ (function () {
         this.db.get("user:" + username, function (err, data) {
             if (err)
                 throw err;
-            else if (data === undefined)
+            if (data === undefined) {
                 callback(null, data);
+            }
             else
                 callback(null, User.fromDb(username, data));
         });
