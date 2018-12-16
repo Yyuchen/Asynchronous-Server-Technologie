@@ -1,13 +1,17 @@
-import WriteStream from "level-ws";
+import  WriteStream from "level-ws";
+import { cpus } from "os";
 
-
-export class  Metric {
+export class  Metric
+{
   public timestamp:string
   public value:number
+  public owner:string
 
-  constructor(ts: string, v:number){
+  constructor(ts: string, v:number, own:string)
+  {
     this.timestamp = ts
     this.value = v
+    this.owner = own
   }
 }
 
@@ -21,38 +25,55 @@ export class MetricsHandler{
 
   public save(key: string, metrics: Metric[], callback: (error: Error | null) => void) {
     const stream = WriteStream(this.db)
-
     stream.on('error', callback)
     stream.on('close', callback)
-    metrics.forEach((m : Metric) => {
-      stream.write({ key: `metric:${key}:${m.timestamp}`, value: m.value })
-    })
+    metrics.forEach((m : Metric) =>
+    {
+      stream.write({ key: `metric:${key}:${m.timestamp}:${m.owner}`, value: m.value })
+      console.log('m -------------------', m);
+  });
     stream.end()
   }
 
-  public get(key:string, callback: (err:Error | null, result?: Metric[]) => void) {
-  
-    const stream = this.db.createReadStream()
+  public getUserMetrics(username:string, callback: (err:Error | null, result?: Metric[]) => void) {
+    console.log("jijiji")
+    const stream = this.db.createReadStream() //fonction provient de leveldb
     var metrics : Metric[] = []
+
     stream.on('error',callback)
     stream.on('end',(err:Error)=>callback(null,metrics))
     stream.on('data',(data:any)=>{
-      var _a = data.key.split(":"), 
-      _ = _a[0],
-      k = _a[1],
-      timestamp = _a[2];
+      const [_, k, timestamp,owner] = data.key.split(":")
       var value = data.value;
-      //ou 
-      //const [_, k, timestamp] = data.key.split(":")
-      //const value = data.value
 
-      if(key!=k){
-        console.log(`LevelDB error: ${data} does not match key ${key}`)
+      if(username.localeCompare(owner)==0)
+      {
+        metrics.push(new Metric (timestamp,value,owner))
       }
-      metrics.push(new Metric (timestamp,value))
-  
     })
-  
+  }
+
+
+  public getMetriByID(key: string, username :string, callback: (err: Error | null, result?: Metric[]) => void) {
+    const stream = this.db.createReadStream()
+    var metrics: Metric[] = []
+
+    stream.on('error',callback)
+    stream.on('end',(err:Error)=>callback(null,metrics))
+    stream.on('data',(data:any)=>{
+      const [_, k, timestamp,owner] = data.key.split(":")
+      var value = data.value;
+      console.log('k',k)
+      console.log('key',key)
+      console.log('username',username)
+      console.log('owner',owner)
+   
+      if(username.localeCompare(owner)==0 && key.localeCompare(k)==0)
+      {
+        console.log("sss")
+        metrics.push(new Metric (timestamp,value,owner))
+      }
+      })
   }
 
   public remove(key: string, callback:(err:Error|null)=>void){

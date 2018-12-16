@@ -15,7 +15,7 @@ describe('Metrics', function () {
     });
     describe('#get', function () {
         it('should get empty array on non existing group', function () {
-            dbMet.get("0", function (err, result) {
+            dbMet.getUserMetrics("0", function (err, result) {
                 chai_1.expect(err).to.be.null;
                 chai_1.expect(result).to.not.be.undefined;
                 chai_1.expect(result).to.be.an('array');

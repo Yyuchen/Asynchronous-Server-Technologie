@@ -5,9 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var level_ws_1 = __importDefault(require("level-ws"));
 var Metric = /** @class */ (function () {
-    function Metric(ts, v) {
+    function Metric(ts, v, own) {
         this.timestamp = ts;
         this.value = v;
+        this.owner = own;
     }
     return Metric;
 }());
@@ -21,25 +22,23 @@ var MetricsHandler = /** @class */ (function () {
         stream.on('error', callback);
         stream.on('close', callback);
         metrics.forEach(function (m) {
-            stream.write({ key: "metric:" + key + ":" + m.timestamp, value: m.value });
+            stream.write({ key: "metric:" + key + ":" + m.timestamp + ":" + m.owner, value: m.value });
+            console.log('m -------------------', m);
         });
         stream.end();
     };
-    MetricsHandler.prototype.get = function (key, callback) {
-        var stream = this.db.createReadStream();
+    MetricsHandler.prototype.getUserMetrics = function (username, callback) {
+        console.log("jijiji");
+        var stream = this.db.createReadStream(); //fonction provient de leveldb
         var metrics = [];
         stream.on('error', callback);
         stream.on('end', function (err) { return callback(null, metrics); });
         stream.on('data', function (data) {
-            var _a = data.key.split(":"), _ = _a[0], k = _a[1], timestamp = _a[2];
+            var _a = data.key.split(":"), _ = _a[0], k = _a[1], timestamp = _a[2], owner = _a[3];
             var value = data.value;
-            //ou 
-            //const [_, k, timestamp] = data.key.split(":")
-            //const value = data.value
-            if (key != k) {
-                console.log("LevelDB error: " + data + " does not match key " + key);
+            if (username.localeCompare(owner) == 0) {
+                metrics.push(new Metric(timestamp, value, owner));
             }
-            metrics.push(new Metric(timestamp, value));
         });
     };
     MetricsHandler.prototype.remove = function (key, callback) {

@@ -22,7 +22,8 @@ var User = /** @class */ (function () {
     //Hash et set password
     User.prototype.setPassword = function (plaintextpwd) {
         var saltRounds = 10;
-        this.password = bcrypt.hash(plaintextpwd, saltRounds);
+        var salt = bcrypt.genSaltSync(saltRounds);
+        this.password = bcrypt.hashSync(plaintextpwd, salt);
         this.passwordHashed = true;
     };
     User.prototype.getPassword = function () {

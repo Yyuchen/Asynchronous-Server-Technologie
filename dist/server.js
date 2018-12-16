@@ -49,7 +49,7 @@ authRouter.post('/login', function (req, res, next) {
         }
         else if (result === undefined || !result.validatePassword(req.body.password)) {
             console.log("0");
-            res.send(req.body.username);
+            res.send(req.body.username + "aaa");
             //res.redirect('/login')
             next(err);
         }
@@ -72,7 +72,28 @@ authRouter.get('/logout', function (req, res) {
     }
     res.redirect('/login');
 });
+authRouter.use(function (req, res, next) {
+    console.log("called authRouter router");
+    next();
+});
+//Récupérer les 
+authRouter.get('/getMet', function (req, res) {
+    dbMetrics.getUserMetrics(req.session.user.username, function (err, result) {
+        console.log("AAB");
+        if (err)
+            throw err;
+        if (result == undefined) {
+            res.write('no result');
+            res.send();
+        }
+        else {
+            res.json(result);
+            // console.log(result)
+        }
+    });
+});
 app.use(authRouter);
+app.use('/getMet', authRouter);
 //authCheck = authMiddleware
 var authCheck = function (req, res, next) {
     if (req.session.loggedIn) {
@@ -85,21 +106,27 @@ var authCheck = function (req, res, next) {
   Root
 */
 app.get('/', authCheck, function (req, res) {
-    res.render('index', { name: req.session.username });
+    res.render('index', { name: req.session.user.username });
 });
 /*
   Users
 */
-userRouter.get('/:username', function (req, res, next) {
-    dbUser.get(req.parames.username, function (err, result) {
-        if (err || result === undefined) {
-            res.status(404).send("user not found");
-        }
-        else {
-            res.status(200).json(result);
-        }
-    });
-});
+//récupéré les metrics d'utilisateur 
+// userRouter.get('/:username',function( req:any , res:any , next:any){
+//     console.log("aaaa")
+//     if(req.session.user.username === req.parames.username)
+//     {
+//         dbMetrics.get(req.parames.username,(err:Error | null, result?: Metric[])=>{
+//             if(err || result === undefined){
+//                 res.status(404).send("Metrics not founde")
+//             }
+//             else{
+//                 console.log("bon")
+//                 res.status(200).json(result)
+//             }
+//         })
+//     }
+// })
 userRouter.post('/signup', function (req, res, next) {
     dbUser.get(req.body.username, function (err, result) {
         if (!err || result !== undefined) {
@@ -115,6 +142,11 @@ userRouter.post('/signup', function (req, res, next) {
         }
     });
 });
+// 
+authRouter.post('/modif', function (req, res) {
+    console.log(req.body);
+    console.log('gggggggggggggggggggggggggggggggggggggggggg');
+});
 userRouter.delete('/:username', function (req, res, next) {
     dbUser.get(req.parames.username, function (err) {
         if (err)
@@ -126,22 +158,28 @@ app.use('/user', userRouter);
 /*
  Metrics
 */
-metricsRouter.use(function (req, res, next) {
-    console.log("called metrics router");
-});
-metricsRouter.get('/:id', function (req, res) {
-    dbMetrics.get(req.parames.id, function (err, result) {
-        if (err)
-            throw err;
-        if (result == undefined) {
-            res.write('no result');
-            res.send();
-        }
-        else
-            res.json(result);
-    });
-});
-metricsRouter.post('/metrics/:id', function (req, res) {
+// metricsRouter.use(function (req:any,res:any,next:any){
+//     console.log("called metrics router")
+//     next()
+// })
+// //Récupérer les 
+// metricsRouter.get('/:id',(req:any, res:any)=>{
+//     console.log("AAc");
+//     // console.log(req);
+//     console.log(req.parames);
+//     req.parames = 'test';
+//     console.log(req.parames.id);
+//   dbMetrics.get(req.parames.id, (err:Error | null, result?: Metric[])=>{
+//       console.log("AAB")
+//       if(err) throw err
+//       if(result == undefined){
+//           res.write('no result')
+//           res.send()
+//       }else res.json(result)
+//   })
+// })
+metricsRouter.post('/test/test', function (req, res) {
+    console.log("BB");
     dbMetrics.save(req.parames.id, req.body, function (err) {
         if (err) {
             res.status(500).send(err);
@@ -149,7 +187,16 @@ metricsRouter.post('/metrics/:id', function (req, res) {
         throw err;
     });
 });
+// metricsRouter.post('/metrics/:id',(req:any,res:any)=>{
+//     console.log("BB")
+//     dbMetrics.save(req.parames.id,req.body,(err:Error|null)=>{
+//         if(err){
+//             res.status(500).send(err)
+//         }throw err
+//     })
+// })
 metricsRouter.delete('/:id', function (req, res, next) {
+    console.log("CC");
     dbMetrics.remove(req.parames.id, function (err) {
         if (err)
             next(err);
@@ -157,6 +204,7 @@ metricsRouter.delete('/:id', function (req, res, next) {
     });
 });
 app.use('/metrics', authCheck, metricsRouter);
+app.use('/', authCheck, metricsRouter);
 /*
     Error handling
 */
@@ -164,7 +212,7 @@ app.use(function (err, req, res, next) {
     console.log('got an error');
     console.error(err.stack);
     // res.status(500).send('Something broke!')
-    res.status(500).send(err + "aaaa");
+    res.status(500).send(err);
 });
 app.listen(port, function (err) {
     if (err) {

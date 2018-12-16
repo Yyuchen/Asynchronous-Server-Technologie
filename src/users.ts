@@ -4,6 +4,7 @@ import { userInfo } from "os";
 import { callbackify } from "util";
 const bcrypt = require('bcrypt')
 
+
 export class User {
   public username: string
   public email: string
@@ -29,7 +30,8 @@ export class User {
   //Hash et set password
   public setPassword(plaintextpwd: string): void {
     const saltRounds = 10
-    this.password = bcrypt.hash(plaintextpwd,saltRounds)
+    const salt = bcrypt.genSaltSync(saltRounds)
+    this.password = bcrypt.hashSync(plaintextpwd, salt)
     this.passwordHashed=true
   }
     
@@ -62,6 +64,8 @@ export class UserHandler {
       })
 
     }
+
+
 
     public save(user: User, callback: (err: Error | null) => void) {
       this.db.put(
